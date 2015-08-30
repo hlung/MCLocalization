@@ -24,6 +24,7 @@
 // Default value is nil
 @property (nonatomic, copy) NSString * noKeyPlaceholder;
 
+// The `key` is used by -valueForKeyPath:, so it can also search through nested dictionaries.
 + (NSString *)stringForKey:(NSString *)key;
 + (NSString *)stringForKey:(NSString *)key withPlaceholders:(NSDictionary *)placeholders;
 + (MCLocalization *)sharedInstance;
@@ -34,7 +35,6 @@
 // Methods exposed for extending purposes
 - (NSDictionary *)stringsForLanguage:(NSString *)language;
 - (NSString *)stringForKey:(NSString *)key language:(NSString *)language;
-
 
 // Legacy methods
 + (void)loadFromJSONFile:(NSString *)fileName defaultLanguage:(NSString *)defaultLanguage;

@@ -151,7 +151,7 @@
 {
     NSDictionary * langugeStrings = [self stringsForLanguage:language];
     
-    NSObject * lookupResult = langugeStrings[key];
+    NSObject * lookupResult = [langugeStrings valueForKeyPath:key];
     NSString * string = nil;
     if ([lookupResult isKindOfClass:NSString.class]) {
         string = (NSString *)lookupResult;
@@ -199,7 +199,6 @@
             }
         }];
     }
-    
     return result;
 }
 
