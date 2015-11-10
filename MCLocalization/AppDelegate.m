@@ -25,7 +25,7 @@
                                         @"en":[[NSBundle mainBundle] URLForResource:@"en.json" withExtension:nil],
                                         @"ru":[[NSBundle mainBundle] URLForResource:@"ru.json" withExtension:nil],
                                         };
-    [MCLocalization loadFromLanguageURLPairs:languageURLPairs defaultLanguage:@"en"];
+    [[MCLocalization sharedInstance] loadFromLanguageURLPairs:languageURLPairs defaultLanguage:@"en"];
     
     [MCLocalization sharedInstance].noKeyPlaceholder = @"[No '{key}' in '{language}']";
     

@@ -60,20 +60,20 @@
 
 #pragma mark - Loading
 
-+ (void)loadFromJSONFile:(NSString *)JSONFilePath defaultLanguage:(NSString *)defaultLanguage
+- (void)loadFromJSONFile:(NSString *)JSONFilePath defaultLanguage:(NSString *)defaultLanguage
 {
     NSURL * URL = [NSURL fileURLWithPath:JSONFilePath];
     return [self loadFromURL:URL defaultLanguage:defaultLanguage];
 }
 
-+ (void)loadFromURL:(NSURL *)JSONFileURL defaultLanguage:(NSString *)defaultLanguage
+- (void)loadFromURL:(NSURL *)JSONFileURL defaultLanguage:(NSString *)defaultLanguage
 {
-    [self sharedInstance].dataSource = [[MCLocalizationSingleJSONFileDataSource alloc] initWithURL:JSONFileURL defaultLanguage:defaultLanguage];
+    self.dataSource = [[MCLocalizationSingleJSONFileDataSource alloc] initWithURL:JSONFileURL defaultLanguage:defaultLanguage];
 }
 
-+ (void)loadFromLanguageURLPairs:(NSDictionary *)languageURLPairs defaultLanguage:(NSString *)defaultLanguage
+- (void)loadFromLanguageURLPairs:(NSDictionary *)languageURLPairs defaultLanguage:(NSString *)defaultLanguage
 {
-    [self sharedInstance].dataSource = [[MCLocalizationOneJSONFilePerLanguageDataSource alloc] initWithLanguageURLPairs:languageURLPairs defaultLanguage:defaultLanguage];
+    self.dataSource = [[MCLocalizationOneJSONFilePerLanguageDataSource alloc] initWithLanguageURLPairs:languageURLPairs defaultLanguage:defaultLanguage];
 }
 
 #pragma mark - Supported languages
@@ -136,8 +136,6 @@
 //    }
 }
 
-#pragma mark - Strings
-
 - (NSDictionary *)stringsForLanguage:(NSString *)language
 {
     if ([language isEqualToString:self.language]) {
@@ -147,12 +145,34 @@
     return [self.dataSource stringsForLanguage:language];
 }
 
-- (NSString *)stringForKey:(NSString *)key language:(NSString *)language
+#pragma mark - String
+
+- (NSString *)stringForKey:(NSString *)key
+{
+    return [self stringForKey:key language:self.language substitutes:nil noKeyPlaceholder:nil];
+}
+
+- (NSString *)stringForKey:(NSString *)key substitutes:(NSDictionary *)substitutes
+{
+    return [self stringForKey:key language:self.language substitutes:substitutes noKeyPlaceholder:nil];
+}
+
+- (NSString *)stringForKey:(NSString *)key noKeyPlaceholder:(NSString *)noKeyPlaceholder
+{
+    return [self stringForKey:key language:self.language substitutes:nil noKeyPlaceholder:noKeyPlaceholder];
+}
+
+- (NSString *)stringForKey:(NSString *)key substitutes:(NSDictionary *)substitutes noKeyPlaceholder:(NSString *)noKeyPlaceholder
+{
+    return [self stringForKey:key language:self.language substitutes:substitutes noKeyPlaceholder:noKeyPlaceholder];
+}
+
+- (NSString *)stringForKey:(NSString *)key language:(NSString *)language substitutes:(NSDictionary *)substitutes noKeyPlaceholder:(NSString *)noKeyPlaceholder
 {
     NSDictionary * langugeStrings = [self stringsForLanguage:language];
     
     NSObject * lookupResult = [langugeStrings valueForKeyPath:key];
-    NSString * string = nil;
+    __block NSString * string = nil;
     if ([lookupResult isKindOfClass:NSString.class]) {
         string = (NSString *)lookupResult;
     } else if ([lookupResult isKindOfClass:NSNumber.class]) {
@@ -160,8 +180,11 @@
     }
 
     if (!string) {
-        if (self.noKeyPlaceholder) {
-            string = self.noKeyPlaceholder;
+        if (noKeyPlaceholder == nil) { // if no placeholder provided, use the one from instance variable
+            noKeyPlaceholder = self.noKeyPlaceholder;
+        }
+        if (noKeyPlaceholder) {
+            string = noKeyPlaceholder;
             string = [string stringByReplacingOccurrencesOfString:@"{key}" withString:key];
             string = [string stringByReplacingOccurrencesOfString:@"{language}" withString:language];
         }
@@ -169,37 +192,17 @@
         NSLog(@"MCLocalization: no string for key %@ in language %@", key, language);
 #endif
     }
-
-    return string;
-}
-
-- (NSString *)stringForKey:(NSString *)key
-{
-    return [self stringForKey:key language:self.language];
-}
-
-+ (NSString *)stringForKey:(NSString *)key
-{
-    return [[MCLocalization sharedInstance] stringForKey:key];
-}
-
-+ (NSString *)stringForKey:(NSString *)key withPlaceholders:(NSDictionary *)placeholders
-{
-    return [[MCLocalization sharedInstance] stringForKey:key withPlaceholders:placeholders];
-}
-
-- (NSString *)stringForKey:(NSString *)localizationKey withPlaceholders:(NSDictionary *)placeholders
-{
-    __block NSString * result = [self stringForKey:localizationKey];
     
-    if (result) {
-        [placeholders enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+    // substitutes
+    if (string) {
+        [substitutes enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
             if ([key isKindOfClass:NSString.class] && [obj isKindOfClass:NSString.class]) {
-                result = [result stringByReplacingOccurrencesOfString:key withString:obj];
+                string = [string stringByReplacingOccurrencesOfString:key withString:obj];
             }
         }];
     }
-    return result;
+    
+    return string;
 }
 
 @end

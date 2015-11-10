@@ -25,16 +25,20 @@
 @property (nonatomic, copy) NSString * noKeyPlaceholder;
 
 // The `key` is used by -valueForKeyPath:, so it can also search through nested dictionaries.
-+ (NSString *)stringForKey:(NSString *)key;
-+ (NSString *)stringForKey:(NSString *)key withPlaceholders:(NSDictionary *)placeholders;
 + (MCLocalization *)sharedInstance;
 
-+ (void)loadFromURL:(NSURL *)JSONFileURL defaultLanguage:(NSString *)defaultLanguage;
-+ (void)loadFromLanguageURLPairs:(NSDictionary *)languageURLPairs defaultLanguage:(NSString *)defaultLanguage;
+// language file loading
+- (void)loadFromURL:(NSURL *)JSONFileURL defaultLanguage:(NSString *)defaultLanguage;
+- (void)loadFromLanguageURLPairs:(NSDictionary *)languageURLPairs defaultLanguage:(NSString *)defaultLanguage;
 
-// Methods exposed for extending purposes
-- (NSDictionary *)stringsForLanguage:(NSString *)language;
-- (NSString *)stringForKey:(NSString *)key language:(NSString *)language;
+// convenience
+- (NSString *)stringForKey:(NSString *)key;
+- (NSString *)stringForKey:(NSString *)key substitutes:(NSDictionary *)substitutes;
+- (NSString *)stringForKey:(NSString *)key noKeyPlaceholder:(NSString *)noKeyPlaceholder;
+- (NSString *)stringForKey:(NSString *)key substitutes:(NSDictionary *)substitutes noKeyPlaceholder:(NSString *)noKeyPlaceholder;
+
+// designated
+- (NSString *)stringForKey:(NSString *)key language:(NSString *)language substitutes:(NSDictionary *)substitutes noKeyPlaceholder:(NSString *)noKeyPlaceholder;
 
 // Legacy methods
 + (void)loadFromJSONFile:(NSString *)fileName defaultLanguage:(NSString *)defaultLanguage;
