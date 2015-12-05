@@ -23,8 +23,6 @@
     NSDictionary * _cachedStrings;
 }
 
-#pragma mark - Singleton
-
 // Singleton
 // Taken from http://lukeredpath.co.uk/blog/a-note-on-objective-c-singletons.html
 + (MCLocalization *)sharedInstance
@@ -37,7 +35,9 @@
     return _sharedObject;
 }
 
-#pragma mark - Init
++ (void)loadFromJSONFile:(NSString *)fileName defaultLanguage:(NSString *)defaultLanguage {
+    [[MCLocalization sharedInstance] loadFromJSONFile:fileName defaultLanguage:defaultLanguage];
+}
 
 - (id)init
 {
